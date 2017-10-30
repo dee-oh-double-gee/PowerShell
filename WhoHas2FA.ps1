@@ -1,0 +1,2 @@
+﻿#run after connecting to exchange online.
+Get-msoluser -All | select DisplayName,@{N='Email';E={$_.UserPrincipalName}},@{N='StrongAuthenticationRequirements';E={($_.StrongAuthenticationRequirements.State)}} | Export-Csv -NoTypeInformation C:\scripts\whohas2fa.csv
