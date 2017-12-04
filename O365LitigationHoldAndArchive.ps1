@@ -1,10 +1,16 @@
-﻿## Connect to O365
+﻿## To Create the o365cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\o365cred.txt" '
 
-$credential = Get-Credential
+$AdminName = "service@insidesales.com" <# Change to the O365 account used for SMTP#>
+$Pass = Get-Content "C:\scripts\o365cred.txt" | ConvertTo-SecureString
+$Cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $AdminName, $Pass
+
+
+
+## connect to O365
 Import-Module MsOnline
-Connect-MsolService -Credential $credential
-$exchangeSession = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri "https://outlook.office365.com/powershell-liveid/" -Credential $credential -Authentication "Basic" -AllowRedirection
-Import-PSSession $exchangeSession -DisableNameChecking
+Connect-MsolService -Credential $Cred
+$ExchangeSession = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri "https://outlook.office365.com/powershell-liveid/" -Credential $Cred -Authentication "Basic" -AllowRedirection
+Import-PSSession $ExchangeSession -DisableNameChecking
 
 
 ## Enable Litigation Hold and Archiving for any mailbox without those things
@@ -13,9 +19,20 @@ Get-Mailbox -ResultSize Unlimited -Filter {RecipientTypeDetails -eq "UserMailbox
 
 Get-Mailbox -Filter {ArchiveStatus -Eq "None" -AND RecipientTypeDetails -eq "UserMailbox"} | Enable-Mailbox -Archive
 
-
+## Send Pushover notification
+## Probably not the safest way to pass the token and user but... eh.
+    $Uri = "https://api.pushover.net/1/messages.json"
+    $Token = Get-Content C:\scripts\pushtoken.txt
+    $User = Get-Content C:\scripts\pushuser.txt
+    $Parameters = @{
+  token = "$Token"
+  user = "$User"
+  title = "Lit+Archive finished"
+  message = "Yay!"
+    }
+    $Parameters | Invoke-RestMethod -Uri $Uri -Method Post
 
 
 ## Disconnect
 
-Remove-PSSession $exchangeSession
+Remove-PSSession $ExchangeSession
