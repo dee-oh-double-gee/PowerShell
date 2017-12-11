@@ -1,4 +1,6 @@
-﻿## To Create the o365cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\o365cred.txt" '
+﻿## This script requires the MsOnline module to be installed. More info here: https://docs.microsoft.com/en-us/powershell/module/msonline/?view=azureadps-1.0
+
+## To Create the o365cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\o365cred.txt" '
 
 $AdminName = "service@insidesales.com" <# Change to the O365 account used for SMTP#>
 $Pass = Get-Content "C:\scripts\o365cred.txt" | ConvertTo-SecureString
