@@ -1,4 +1,6 @@
 ﻿## This script requires the MsOnline module to be installed. More info here: https://docs.microsoft.com/en-us/powershell/module/msonline/?view=azureadps-1.0
+## This script is also meant to be ran via Scheduled Task. 
+
 
 ## To Create the o365cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\o365cred.txt" '
 
