@@ -1,4 +1,5 @@
 ﻿## Basic Daily checks script that sends an email
+## Can be ran once or ran in a Scheduled task
 
 ## Run this command before you run this script for the first time or after you actually add a new domain admin:
 ## EDIT: After it notifies of a change, you may have to delete C:\scripts\Domainadmins.xml and then run the below command
