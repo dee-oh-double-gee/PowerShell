@@ -21,7 +21,7 @@ if ($CheckFile){} else {
 
 Invoke-command -ComputerName IS-DC1 <# Change to one of your Windows based DNS servers's #> -ScriptBlock {dcdiag /test:DNS /e} | out-File c:\scripts\dns.txt
 
-$dns = gc c:\scripts\dns.txt -Tail 2
+$dns = Get-Content c:\scripts\dns.txt -Tail 2
 
 
 
@@ -67,11 +67,11 @@ If ($oldxmlhash -ne $newxmlhash){
 $passnoexpire = (Get-ADUser -Filter 'useraccountcontrol -band 65536').SamAccountName
 ## Gets some AD information
 $numberofadusers = (get-aduser –filter *).count
-$numberofenabledusers = (get-aduser -filter *|where {$_.enabled -eq "True"}).count
-$numberofdisabledusers = (get-aduser -filter *|where {$_.enabled -ne "False"}).count
+$numberofenabledusers = (get-aduser -filter * | Where-Object {$_.enabled -eq "True"}).count
+$numberofdisabledusers = (get-aduser -filter * | Where-Object {$_.enabled -ne "False"}).count
 $numberofcomputers = (get-adcomputer –filter *).count
-$enabledcomputers = (get-adcomputer -filter *|where {$_.enabled -eq "True"}).count
-$disabledcomputers = (get-adcomputer -filter *|where {$_.enabled -ne "False"}).count
+$enabledcomputers = (get-adcomputer -filter * | Where-Object {$_.enabled -eq "True"}).count
+$disabledcomputers = (get-adcomputer -filter * | Where-Object {$_.enabled -ne "False"}).count
 
 ## Check for accounts that have no password requirement
 # Get-ADUser -Filter 'useraccountcontrol -band 32' -Properties useraccountcontrol | Select SamAccountName
