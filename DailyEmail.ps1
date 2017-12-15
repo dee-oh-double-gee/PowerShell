@@ -3,12 +3,17 @@
 
 ## Run this command before you run this script for the first time or after you actually add a new domain admin:
 ## EDIT: After it notifies of a change, you may have to delete C:\scripts\Domainadmins.xml and then run the below command
-## (Get-ADGroupMember -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
+## (Get-ADGroupMember -server $ADserver -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
 ## EDIT: actually let me just run it for you :)  :
+
+## Change to  your AD server. If you don't specify a server it may grab the "Domain Admins" from another DC and then get the same result but in
+## a different order and that will make the hash different and then the if statement will flag that the admins have changed even if they have not.
+$ADserver = IS-DC1
+
 
 $CheckFile = Test-Path C:\scripts\Domainadmins.xml
 if ($CheckFile){} else {
-    (Get-ADGroupMember -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
+    (Get-ADGroupMember -server $ADserver -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
 }
 
 
@@ -22,8 +27,8 @@ $dns = gc c:\scripts\dns.txt -Tail 2
 
 ## Checks all of AD for Domain Admin accounts and displays them. Even if the account is disabled.
 
-#$domainadmins = Get-ADGroupMember -server IS-DC1 -Identity 'Domain Admins' | Select-Object samAccountName
-$domainadmins = (Get-ADGroupMember -Identity 'Domain Admins').samAccountName
+#$domainadmins = Get-ADGroupMember -server $ADserver -Identity 'Domain Admins' | Select-Object samAccountName
+$domainadmins = (Get-ADGroupMember -server $ADserver -Identity 'Domain Admins').samAccountName
 $domainadmins | Export-Clixml -Path C:\scripts\Newdomainadmins.xml -Force
 
 $oldxml = ("C:\scripts\Domainadmins.xml")
@@ -108,4 +113,4 @@ $Cred = new-object -typename System.Management.Automation.PSCredential -argument
 ## Sends email based on the credentials provided. 
 ## These settings will only work with Office 365. You may have to change some of the settings depending on your SMTP server
 
-Send-MailMessage -To helpdesk@insidesales.com -from no-reply@insidesales.com -Subject $Subject -Priority $Priority -Body $body -smtpserver smtp.office365.com -usessl -Credential $cred -Port 587 
+Send-MailMessage -To beau@insidesales.com -from no-reply@insidesales.com -Subject $Subject -Priority $Priority -Body $body -smtpserver smtp.office365.com -usessl -Credential $cred -Port 587 
