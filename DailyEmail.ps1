@@ -8,7 +8,7 @@
 
 ## Change to  your AD server. If you don't specify a server it may grab the "Domain Admins" from another DC and then get the same result but in
 ## a different order and that will make the hash different and then the if statement will flag that the admins have changed even if they have not.
-$ADserver = IS-DC1
+$ADserver = 'IS-DC1'
 
 
 $CheckFile = Test-Path C:\scripts\Domainadmins.xml
