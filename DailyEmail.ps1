@@ -3,7 +3,7 @@
 
 ## Run this command before you run this script for the first time or after you actually add a new domain admin:
 ## EDIT: After it notifies of a change, you may have to delete C:\scripts\Domainadmins.xml and then run the below command
-## (Get-ADGroupMember -server $ADserver -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
+## (Get-ADGroupMember -server <ServerName> -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
 ## EDIT: actually let me just run it for you :)  :
 
 ## Change to  your AD server. If you don't specify a server it may grab the "Domain Admins" from another DC and then get the same result but in
