@@ -23,8 +23,6 @@ Invoke-command -ComputerName IS-DC1 <# Change to one of your Windows based DNS s
 
 $dns = Get-Content c:\scripts\dns.txt -Tail 2
 
-
-
 ## Checks all of AD for Domain Admin accounts and displays them. Even if the account is disabled.
 
 #$domainadmins = Get-ADGroupMember -server $ADserver -Identity 'Domain Admins' | Select-Object samAccountName
@@ -59,8 +57,6 @@ If ($oldxmlhash -ne $newxmlhash){
 }
 
 
-
-
 ## Check for accounts that don't have password expiry set. This includes disabled accounts
 
 #$passnoexpire = Get-ADUser -Filter 'useraccountcontrol -band 65536' -Properties useraccountcontrol | Select SamAccountName | out-string
@@ -77,8 +73,6 @@ $disabledcomputers = (get-adcomputer -filter * | Where-Object {$_.enabled -ne "F
 # Get-ADUser -Filter 'useraccountcontrol -band 32' -Properties useraccountcontrol | Select SamAccountName
 
 ## Builds out the basic email
-
-
 
 $body = @()
 $body += $Difference
@@ -103,7 +97,6 @@ $body += "Total Number of Disabled Computers: $disabledcomputers"
 $body = $body | out-string
 
 
-
 ## To Create the cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\cred.txt" '
 
 $AdminName = "no-reply@insidesales.com" <# Change to the O365 account used for SMTP#>
@@ -113,4 +106,16 @@ $Cred = new-object -typename System.Management.Automation.PSCredential -argument
 ## Sends email based on the credentials provided. 
 ## These settings will only work with Office 365. You may have to change some of the settings depending on your SMTP server
 
-Send-MailMessage -To beau@insidesales.com -from no-reply@insidesales.com -Subject $Subject -Priority $Priority -Body $body -smtpserver smtp.office365.com -usessl -Credential $cred -Port 587 
+$emailparam = @{
+    'To' = 'beau@insidesales.com'
+    'From' = 'no-reply@insidesales.com'
+    'Subject' = $Subject
+    'Priority' = $Priority
+    'Body' = $Body
+    'smtpserver' = 'smtp.office365.com'
+    'Credential' = $Cred
+    'Port' = '587'
+    'usessl' = $true
+}
+
+Send-MailMessage @emailparam
