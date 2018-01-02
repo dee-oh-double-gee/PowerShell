@@ -1,15 +1,36 @@
-﻿## Basic Daily checks script that sends an email
-## Can be ran once or ran in a Scheduled task
+﻿
+<#
+    .SYNOPSIS
+    Basic Daily checks script that sends an email
 
-## Run this command before you run this script for the first time or after you actually add a new domain admin:
-## EDIT: After it notifies of a change, you may have to delete C:\scripts\Domainadmins.xml and then run the below command
-## (Get-ADGroupMember -server <ServerName> -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
-## EDIT: actually let me just run it for you :)  :
+    .DESCRIPTION
+    Basic Daily checks script that sends an email
+    Can be ran once or ran in a Scheduled task: Powershell.exe -windowstyle hidden C:\Powershell\DailyEmail.ps1
 
-## Change to  your AD server. If you don't specify a server it may grab the "Domain Admins" from another DC and then get the same result but in
-## a different order and that will make the hash different and then the if statement will flag that the admins have changed even if they have not.
+    Some things need to be done and some changes need to be made to the script before you will be able to run it:
+    1. Change the name of the $ADserver to the name of a DC on your domain. If you don't specify a server it may grab the list from different DC's and get different hashes. which is bad.
+    2. Change all the email settings and pushover settings if you want to use that
+    3. Run the script once manually to create the Domainadmins.xml file. This is what the script uses for a reference. It will also help you test the email settings
+
+	
+	
+    .EXAMPLE
+    Scheduled task: Powershell.exe -windowstyle hidden C:\Powershell\DailyEmail.ps1
+    One time: .\DailyEmail.ps1
+
+    .LINK
+    https://github.com/dee-oh-double-gee/PowerShell
+#>
+
+
 $ADserver = 'IS-DC1'
 
+
+<#Run this command before you run this script for the first time or after you actually add a new domain admin:
+    EDIT: After it notifies of a change, you may have to delete C:\scripts\Domainadmins.xml and then run the below command
+    (Get-ADGroupMember -server <ServerName> -Identity 'Domain Admins').samAccountName | Export-Clixml -Path C:\scripts\Domainadmins.xml -Force
+    EDIT: actually let me just run it for you :)  :
+    #>
 
 $CheckFile = Test-Path C:\scripts\Domainadmins.xml
 if ($CheckFile){} else {
@@ -107,7 +128,7 @@ $Cred = new-object -typename System.Management.Automation.PSCredential -argument
 ## These settings will only work with Office 365. You may have to change some of the settings depending on your SMTP server
 
 $emailparam = @{
-    'To' = 'beau@insidesales.com'
+    'To' = 'helpdesk@insidesales.com'
     'From' = 'no-reply@insidesales.com'
     'Subject' = $Subject
     'Priority' = $Priority
