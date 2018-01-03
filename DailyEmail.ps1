@@ -4,27 +4,34 @@
     Basic Daily checks script that sends an email
 
     .DESCRIPTION
-    Basic Daily checks script that sends an email
-    Can be ran once or ran in a Scheduled task: Powershell.exe -windowstyle hidden C:\Powershell\DailyEmail.ps1
+    Basic Daily checks script that sends an email. It will change the subjext and priority of the email and send a pushover notification if the list of Domain Admins changes
+    Can be ran once or ran in a Scheduled task
 
+    .NOTES
     Some things need to be done and some changes need to be made to the script before you will be able to run it:
     1. Change the name of the $ADserver to the name of a DC on your domain. If you don't specify a server it may grab the list from different DC's and get different hashes. which is bad.
-    2. Change all the email settings and pushover settings if you want to use that
+    2. Change all the email settings including creating the cred.txt as instructed and pushover settings if you want to use that
     3. Run the script once manually to create the Domainadmins.xml file. This is what the script uses for a reference. It will also help you test the email settings
 
-	
-	
     .EXAMPLE
     Scheduled task: Powershell.exe -windowstyle hidden C:\Powershell\DailyEmail.ps1
+
+    .EXAMPLE
     One time: .\DailyEmail.ps1
 
     .LINK
     https://github.com/dee-oh-double-gee/PowerShell
 #>
 
-
+####### Change these settings: ########
 $ADserver = 'IS-DC1'
-
+$SMTPemail = 'no-reply@insidesales.com' # Change to the O365 account used for SMTP
+$To = 'helpdesk@insidesales.com'
+## To Create the cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\cred.txt" '
+$Pass = Get-Content "C:\scripts\cred.txt" | ConvertTo-SecureString
+$smtpserver = 'smtp.office365.com'
+$Port = 587
+$usessl = $true
 
 <#Run this command before you run this script for the first time or after you actually add a new domain admin:
     EDIT: After it notifies of a change, you may have to delete C:\scripts\Domainadmins.xml and then run the below command
@@ -118,25 +125,22 @@ $body += "Total Number of Disabled Computers: $disabledcomputers"
 $body = $body | out-string
 
 
-## To Create the cred.txt run: ' Read-Host -Prompt "Enter your password" -AsSecureString | ConvertFrom-SecureString | Out-File "C:\scripts\cred.txt" '
 
-$AdminName = "no-reply@insidesales.com" <# Change to the O365 account used for SMTP#>
-$Pass = Get-Content "C:\scripts\cred.txt" | ConvertTo-SecureString
-$Cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $AdminName, $Pass
+$Cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $SMTPemail, $Pass
 
 ## Sends email based on the credentials provided. 
 ## These settings will only work with Office 365. You may have to change some of the settings depending on your SMTP server
 
 $emailparam = @{
-    'To' = 'helpdesk@insidesales.com'
-    'From' = 'no-reply@insidesales.com'
+    'To' = $To
+    'From' = $SMTPemail
     'Subject' = $Subject
     'Priority' = $Priority
     'Body' = $Body
-    'smtpserver' = 'smtp.office365.com'
+    'smtpserver' = $smtpserver
     'Credential' = $Cred
-    'Port' = '587'
-    'usessl' = $true
+    'Port' = $Port
+    'usessl' = $usessl
 }
 
 Send-MailMessage @emailparam
